@@ -13,7 +13,6 @@
   --muted:#9fb3ab;
   --shell:#ffd400;
 }
-
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -24,124 +23,52 @@ body{
     var(--bg);
   color:var(--text);
 }
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:32px 20px 64px;
-}
+.container{max-width:1200px;margin:auto;padding:32px 20px 64px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.admin-pill{background:#16201c;border:1px solid var(--border);padding:10px 14px;border-radius:999px;cursor:pointer}
 
-/* ---------- HEADER ---------- */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:28px;
-}
-.admin-pill{
-  background:#16201c;
-  border:1px solid var(--border);
-  padding:10px 14px;
-  border-radius:999px;
-  cursor:pointer;
-}
-
-/* ---------- ROOMS ---------- */
-.rooms{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
+.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media(max-width:900px){.rooms{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.rooms{grid-template-columns:1fr}}
 
 .card{
-  border-radius:20px;
-  padding:20px;
-  min-height:240px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  border-radius:20px;padding:20px;min-height:240px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:0 12px 30px rgba(0,0,0,.35)
 }
-.card h3{margin:0}
 .meta{font-size:13px;opacity:.85;margin:6px 0}
 
-/* ---------- STATUS ---------- */
-.status-line{display:flex;align-items:center;gap:8px;margin-top:6px}
-.status-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:#9fb3ab;
-}
+.status-line{display:flex;align-items:center;gap:8px}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#9fb3ab}
 @keyframes pulse{
   0%{box-shadow:0 0 0 0 rgba(0,255,106,.7)}
   70%{box-shadow:0 0 0 10px rgba(0,255,106,0)}
   100%{box-shadow:0 0 0 0 rgba(0,255,106,0)}
 }
-.status-dot.started{
-  background:#00ff6a;
-  animation:pulse 1.5s infinite;
-}
+.status-dot.started{background:#00ff6a;animation:pulse 1.5s infinite}
 
-/* ---------- JOIN ---------- */
-.join{
-  background:#fff;
-  color:#000;
-  padding:10px 16px;
-  border-radius:999px;
-  font-weight:600;
-  cursor:pointer;
-}
+.join{background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:600;cursor:pointer}
 
-/* ---------- THEMES ---------- */
 .foundations{background:linear-gradient(135deg,#1db954,#0f3d2e)}
 .change{background:linear-gradient(135deg,#ffd400,#8a6b00);color:#000}
-.ba{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
-.xd{background:linear-gradient(135deg,#a78bfa,#4c1d95)}
-.lounge{background:linear-gradient(135deg,#fb7185,#7f1d1d)}
 
-.disabled{filter:grayscale(1);opacity:.55;pointer-events:none}
-
-/* ---------- ADMIN SIDEBAR ---------- */
 .drawer{
-  position:fixed;
-  top:0;left:0;
-  width:360px;height:100%;
-  background:#0f1513;
-  border-right:1px solid var(--border);
-  transform:translateX(-100%);
-  transition:.3s ease;
-  padding:20px;
-  z-index:1000;
+  position:fixed;top:0;left:0;width:360px;height:100%;
+  background:#0f1513;border-right:1px solid var(--border);
+  transform:translateX(-100%);transition:.3s ease;padding:20px;z-index:1000
 }
 .drawer.open{transform:translateX(0)}
 
-.input,textarea,select{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#0b0f0e;
-  color:#fff;
+.input,textarea{
+  width:100%;padding:10px;margin-bottom:10px;
+  border-radius:12px;border:1px solid var(--border);
+  background:#0b0f0e;color:#fff
 }
 .btn{padding:10px 14px;border-radius:999px;border:none;cursor:pointer}
 .primary{background:var(--shell);color:#000}
 
-/* ---------- MODAL ---------- */
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  z-index:2000;
-}
-.modal-box{
-  max-width:720px;
-  margin:6vh auto;
-  background:#0f1513;
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:20px;
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:2000}
+.modal-box{max-width:720px;margin:6vh auto;background:#0f1513;border-radius:18px;padding:20px}
 </style>
 </head>
 
@@ -154,77 +81,40 @@ body{
   <div class="rooms" id="rooms"></div>
 </div>
 
-<!-- LOGIN MODAL -->
+<!-- LOGIN -->
 <div class="modal" id="loginModal">
   <div class="modal-box">
     <h3>Admin Login</h3>
-    <input class="input" id="loginUser" placeholder="Username"/>
-    <input class="input" type="password" id="loginPwd" placeholder="Password"/>
-    <div style="display:flex;justify-content:flex-end;gap:10px">
-      <button class="btn" onclick="closeLogin()">Cancel</button>
-      <button class="btn primary" onclick="login()">Login</button>
-    </div>
+    <input class="input" id="user" placeholder="Username"/>
+    <input class="input" id="pwd" type="password" placeholder="Password"/>
+    <button class="btn primary" onclick="login()">Login</button>
   </div>
 </div>
 
-<!-- ADMIN SIDEBAR -->
+<!-- ADMIN -->
 <div class="drawer" id="drawer">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>Admin Console</h3>
-    <button class="btn" onclick="toggleDrawer()">⟨</button>
-  </div>
-  <div id="adminArea"></div>
-</div>
-
-<!-- EDIT ROOM MODAL -->
-<div class="modal" id="editModal">
-  <div class="modal-box">
-    <h3>Edit Room</h3>
-    <input class="input" id="mName" placeholder="Room name"/>
-    <input class="input" id="mLink" placeholder="Teams link"/>
-    <textarea class="input" id="mDesc" placeholder="Description"></textarea>
-    <label>Start time</label>
-    <input class="input" type="datetime-local" id="mStart"/>
-    <select class="input" id="mClass">
-      <option value="foundations">Foundations</option>
-      <option value="change">Transformation Change</option>
-      <option value="ba">Business Analysts</option>
-      <option value="xd">Experience Design</option>
-      <option value="lounge">Leisure Room</option>
-    </select>
-    <label><input type="checkbox" id="mEnabled"/> Enabled</label>
-    <button class="btn" onclick="resetCounter()">Reset join counter</button>
-    <div style="display:flex;justify-content:flex-end;gap:10px">
-      <button class="btn" onclick="closeEdit()">Cancel</button>
-      <button class="btn primary" onclick="saveEdit()">Save</button>
-    </div>
-  </div>
+  <h3>Admin Console</h3>
+  <button class="btn" onclick="exportConfig()">Export updated rooms.json</button>
 </div>
 
 <script>
 const ADMIN={user:'Shell_ADT',pwd:'Deloitte123'};
-const KEY='vlc_rooms_final';
-let isAdmin=false,activeId=null;
+let ROOMS=[];
 
-const DEFAULT=[
- {id:'foundations',cls:'foundations',name:'Foundations',desc:'Core concepts',link:'#',start:'',enabled:true,clicks:0},
- {id:'change',cls:'change',name:'Transformation Change',desc:'Change journey',link:'#',start:'',enabled:true,clicks:0},
- {id:'ba',cls:'ba',name:'Business Analysts',desc:'Analysis & AI',link:'#',start:'',enabled:true,clicks:0},
- {id:'xd',cls:'xd',name:'Experience Design',desc:'Design thinking',link:'#',start:'',enabled:true,clicks:0},
- {id:'lounge',cls:'lounge',name:'Leisure Room',desc:'Informal space',link:'#',start:'',enabled:true,clicks:0}
-];
-
-let ROOMS=JSON.parse(localStorage.getItem(KEY))||DEFAULT;
-function save(){localStorage.setItem(KEY,JSON.stringify(ROOMS));}
+async function loadRooms(){
+  const res = await fetch('rooms.json');
+  ROOMS = await res.json();
+  render();
+}
 
 function started(r){
   if(!r.start) return false;
-  return new Date()>=new Date(r.start);
+  return new Date() >= new Date(r.start);
 }
 
 function render(){
-  rooms.innerHTML=ROOMS.map(r=>`
-    <div class="card ${r.cls} ${r.enabled?'':'disabled'}">
+  rooms.innerHTML = ROOMS.map(r=>`
+    <div class="card ${r.cls}">
       <div>
         <h3>${r.name}</h3>
         <div class="status-line">
@@ -235,72 +125,35 @@ function render(){
         <p>${r.desc}</p>
       </div>
       <div class="join" onclick="join('${r.id}')">Enter room</div>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
 function join(id){
-  const r=ROOMS.find(x=>x.id===id);
-  r.clicks++; save(); render();
+  const r = ROOMS.find(x=>x.id===id);
+  r.clicks++;
+  render();
   window.open(r.link,'_blank');
 }
 
-/* ---------- ADMIN ---------- */
+/* ADMIN */
 function openLogin(){loginModal.style.display='block'}
-function closeLogin(){loginModal.style.display='none'}
-
 function login(){
-  if(loginUser.value===ADMIN.user && loginPwd.value===ADMIN.pwd){
-    isAdmin=true;
-    closeLogin();
+  if(user.value===ADMIN.user && pwd.value===ADMIN.pwd){
+    loginModal.style.display='none';
     drawer.classList.add('open');
-    renderAdmin();
   } else alert('Invalid credentials');
 }
 
-function toggleDrawer(){drawer.classList.toggle('open')}
-
-function renderAdmin(){
-  if(!isAdmin) return;
-  adminArea.innerHTML=ROOMS.map(r=>`
-    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-      <span>${r.name}</span>
-      <button class="btn" onclick="openEdit('${r.id}')">Edit</button>
-    </div>`).join('');
+function exportConfig(){
+  const blob = new Blob([JSON.stringify(ROOMS,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rooms.json';
+  a.click();
 }
 
-function openEdit(id){
-  const r=ROOMS.find(x=>x.id===id);
-  activeId=id;
-  mName.value=r.name;
-  mLink.value=r.link;
-  mDesc.value=r.desc;
-  mStart.value=r.start;
-  mClass.value=r.cls;
-  mEnabled.checked=r.enabled;
-  editModal.style.display='block';
-}
-function closeEdit(){editModal.style.display='none'}
-function saveEdit(){
-  const r=ROOMS.find(x=>x.id===activeId);
-  r.name=mName.value;
-  r.link=mLink.value;
-  r.desc=mDesc.value;
-  r.start=mStart.value;
-  r.cls=mClass.value;
-  r.enabled=mEnabled.checked;
-  save();
-  closeEdit();
-  render();
-  renderAdmin();
-}
-function resetCounter(){
-  const r=ROOMS.find(x=>x.id===activeId);
-  r.clicks=0;
-  save();
-  render();
-}
-
-render();
+loadRooms();
 </script>
 </body>
 </html>
