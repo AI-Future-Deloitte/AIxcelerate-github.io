@@ -1,9 +1,6 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Shell × Deloitte | Virtual Learning Corridor</title>
+<html lang="en="viewport" content="width=device-width, initial-scale=1"/><html lang="en">
+<title>Virtual Learning Corridor</title>
 
 <style>
 :root{
@@ -24,21 +21,29 @@ body{
   color:var(--text);
 }
 .container{max-width:1200px;margin:auto;padding:32px 20px 64px}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-.admin-pill{background:#16201c;border:1px solid var(--border);padding:10px 14px;border-radius:999px;cursor:pointer}
 
+/* ---------- HEADER ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.admin-pill{
+  background:#16201c;border:1px solid var(--border);
+  padding:10px 14px;border-radius:999px;cursor:pointer
+}
+
+/* ---------- ROOMS ---------- */
 .rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 @media(max-width:900px){.rooms{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.rooms{grid-template-columns:1fr}}
 
 .card{
-  border-radius:20px;padding:20px;min-height:240px;
+  border-radius:20px;padding:20px;min-height:280px;
   display:flex;flex-direction:column;justify-content:space-between;
   box-shadow:0 12px 30px rgba(0,0,0,.35)
 }
+.card.disabled{opacity:.5;filter:grayscale(1)}
 .meta{font-size:13px;opacity:.85;margin:6px 0}
 
-.status-line{display:flex;align-items:center;gap:8px}
+/* ---------- STATUS ---------- */
+.status-line{display:flex;align-items:center;gap:8px;margin:6px 0}
 .status-dot{width:10px;height:10px;border-radius:50%;background:#9fb3ab}
 @keyframes pulse{
   0%{box-shadow:0 0 0 0 rgba(0,255,106,.7)}
@@ -47,15 +52,26 @@ body{
 }
 .status-dot.started{background:#00ff6a;animation:pulse 1.5s infinite}
 
-.join{background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-weight:600;cursor:pointer}
+/* ---------- JOIN ---------- */
+.join{
+  background:#fff;color:#000;
+  padding:10px 16px;border-radius:999px;
+  font-weight:600;cursor:pointer;text-align:center
+}
 
+/* ---------- THEMES ---------- */
 .foundations{background:linear-gradient(135deg,#1db954,#0f3d2e)}
 .change{background:linear-gradient(135deg,#ffd400,#8a6b00);color:#000}
+.ba{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
+.xd{background:linear-gradient(135deg,#a78bfa,#4c1d95)}
+.lounge{background:linear-gradient(135deg,#fb7185,#7f1d1d)}
 
+/* ---------- ADMIN ---------- */
 .drawer{
   position:fixed;top:0;left:0;width:360px;height:100%;
   background:#0f1513;border-right:1px solid var(--border);
-  transform:translateX(-100%);transition:.3s ease;padding:20px;z-index:1000
+  transform:translateX(-100%);transition:.3s ease;
+  padding:20px;z-index:1000
 }
 .drawer.open{transform:translateX(0)}
 
@@ -67,15 +83,22 @@ body{
 .btn{padding:10px 14px;border-radius:999px;border:none;cursor:pointer}
 .primary{background:var(--shell);color:#000}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:2000}
-.modal-box{max-width:720px;margin:6vh auto;background:#0f1513;border-radius:18px;padding:20px}
+/* ---------- MODAL ---------- */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;z-index:2000
+}
+.modal-box{
+  max-width:520px;margin:6vh auto;
+  background:#0f1513;border-radius:18px;padding:20px
+}
 </style>
 </head>
 
 <body>
 <div class="container">
   <div class="topbar">
-    <h1>Virtual Learning Corridor</h1>
+    <h1 id="programName">Virtual Learning Corridor</h1>
     <div class="admin-pill" onclick="openLogin()">Admin</div>
   </div>
   <div class="rooms" id="rooms"></div>
@@ -93,50 +116,76 @@ body{
 
 <!-- ADMIN -->
 <div class="drawer" id="drawer">
-  <h3>Admin Console</h3>
-  <button class="btn" onclick="exportConfig()">Export updated rooms.json</button>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h3>Admin Console</h3>
+    <button class="btn" onclick="toggleDrawer()">⟨</button>
+  </div>
+  <button class="btn primary" onclick="exportConfig()">Export rooms.json</button>
 </div>
 
 <script>
 const ADMIN={user:'Shell_ADT',pwd:'Deloitte123'};
+let DATA=null;
 let ROOMS=[];
 
-async function loadRooms(){
+/* ---------- LOAD JSON ---------- */
+async function loadConfig(){
   const res = await fetch('rooms.json');
-  ROOMS = await res.json();
+  DATA = await res.json();
+  ROOMS = DATA.rooms.sort((a,b)=>a.displayOrder-b.displayOrder);
+  document.getElementById('programName').innerText = DATA.meta.programName;
   render();
 }
 
-function started(r){
-  if(!r.start) return false;
-  return new Date() >= new Date(r.start);
+/* ---------- STATUS ---------- */
+function isStarted(room){
+  if(room.session?.statusMode === 'manual') return true;
+  if(!room.session?.startTime) return false;
+  return new Date() >= new Date(room.session.startTime);
 }
 
+/* ---------- RENDER ---------- */
 function render(){
-  rooms.innerHTML = ROOMS.map(r=>`
-    <div class="card ${r.cls}">
-      <div>
-        <h3>${r.name}</h3>
-        <div class="status-line">
-          <span class="status-dot ${started(r)?'started':''}"></span>
-          ${started(r)?'Started':'Not started'}
+  rooms.innerHTML = ROOMS.map(r=>{
+    const started = isStarted(r);
+    const enabled = r.access?.enabled !== false;
+    r.metrics = r.metrics || { portalJoinClicks: 0 };
+
+    return `
+      <div class="card ${r.theme.styleClass} ${!enabled?'disabled':''}">
+        <div>
+          <h3>${r.title}</h3>
+          <div class="meta">${r.subtitle || ''}</div>
+
+          <div class="status-line">
+            <span class="status-dot ${started?'started':''}"></span>
+            ${started?'Started':'Not started'}
+          </div>
+
+          <div class="meta">Persona: ${r.persona || '—'}</div>
+          <div class="meta">👥 ${r.metrics.portalJoinClicks} joined from portal</div>
+          <p>${r.description}</p>
         </div>
-        <div class="meta">👥 ${r.clicks} joined from portal</div>
-        <p>${r.desc}</p>
+
+        ${
+          enabled
+            ? `<div class="join" onclick="join('${r.id}')">Enter room</div>`
+            : `<div class="meta">Room closed</div>`
+        }
       </div>
-      <div class="join" onclick="join('${r.id}')">Enter room</div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
+/* ---------- JOIN ---------- */
 function join(id){
   const r = ROOMS.find(x=>x.id===id);
-  r.clicks++;
+  r.metrics.portalJoinClicks++;
   render();
-  window.open(r.link,'_blank');
+  window.open(r.access.meetingLink,'_blank');
 }
 
-/* ADMIN */
+/* ---------- ADMIN ---------- */
 function openLogin(){loginModal.style.display='block'}
 function login(){
   if(user.value===ADMIN.user && pwd.value===ADMIN.pwd){
@@ -144,16 +193,21 @@ function login(){
     drawer.classList.add('open');
   } else alert('Invalid credentials');
 }
+function toggleDrawer(){drawer.classList.toggle('open')}
 
 function exportConfig(){
-  const blob = new Blob([JSON.stringify(ROOMS,null,2)],{type:'application/json'});
+  DATA.meta.lastUpdated = new Date().toISOString();
+  DATA.rooms = ROOMS;
+  const blob = new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'rooms.json';
   a.click();
 }
 
-loadRooms();
+loadConfig();
 </script>
 </body>
 </html>
+<head>
+<meta charset="utf-8"/>
